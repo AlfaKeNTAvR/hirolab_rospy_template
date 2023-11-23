@@ -252,6 +252,11 @@ def main():
     # # ROS launch file parameters:
     node_name = rospy.get_name()
 
+    node_frequency = rospy.get_param(
+        param_name=f'{rospy.get_name()}/node_frequency',
+        default=1000,
+    )
+
     parameter1 = rospy.get_param(
         param_name=f'{node_name}/parameter1_name',
         default='some_value',
@@ -263,9 +268,11 @@ def main():
     )
 
     rospy.on_shutdown(class_instance.node_shutdown)
+    node_rate = rospy.Rate(node_frequency)
 
     while not rospy.is_shutdown():
         class_instance.main_loop()
+        node_rate.sleep()
 
 
 if __name__ == '__main__':
