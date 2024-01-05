@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 """
 
+Author(s):
+
+TODO:
+
 """
 
 # # Standart libraries:
@@ -36,13 +40,15 @@ class ClassName:
         
         """
 
-        # # Private constants:
-        self.__PRIVATE_CONSTANT = 1
+        # # Private CONSTANTS:
+        # NOTE: By default all new class CONSTANTS should be private.
+        self.__NODE_NAME = node_name
 
-        # # Public constants:
-        self.NODE_NAME = node_name
+        # # Public CONSTANTS:
+        self.PUBLIC_CONTANT = 1
 
         # # Private variables:
+        # NOTE: By default all new class variables should be private.
         self.__private_variable = 1
 
         # # Public variables:
@@ -53,7 +59,7 @@ class ClassName:
         self.__dependency_initialized = False
 
         self.__node_is_initialized = rospy.Publisher(
-            f'{self.NODE_NAME}/is_initialized',
+            f'{self.__NODE_NAME}/is_initialized',
             Bool,
             queue_size=1,
         )
@@ -65,50 +71,54 @@ class ClassName:
 
         # NOTE: Specify dependency is_initialized topic (or any other topic,
         # which will be available when the dependency node is running properly).
-        self.__dependency_status_topics = {
-            # 'dependency_node_name':
-            #     rospy.Subscriber(
-            #         f'/dependency_node_name/is_initialized',
-            #         Bool,
-            #         self.__dependency_name_callback,
-            #     ),
-        }
+        self.__dependency_status_topics = {}
+
+        # self.__dependency_status_topics['<dependency_node_name>'] = (
+        #     rospy.Subscriber(
+        #         f'/<dependency_node_name>/is_initialized',
+        #         Bool,
+        #         self.__dependency_name_callback,
+        #     )
+        # )
 
         # # Service provider:
         rospy.Service(
-            f'{self.NODE_NAME}/service_name1',
+            f'{self.__NODE_NAME}/<service_name1>',
             SetBool,
             self.__service_name1_handler,
         )
 
         # # Service subscriber:
         self.__service = rospy.ServiceProxy(
-            '/service_name2',
+            '/<service_name2>',
             ServiceType2,
         )
 
         # # Topic publisher:
         self.__publisher = rospy.Publisher(
-            f'{self.NODE_NAME}/topic_name1',
+            f'{self.__NODE_NAME}/<topic_name1>',
             Bool,
             queue_size=1,
         )
 
         # # Topic subscriber:
         rospy.Subscriber(
-            '/topic_name2',
+            '/<topic_name2>',
             MessageType2,
             self.__topic_name2_callback,
         )
 
         # # Timers:
-        rospy.Timer(rospy.Duration(1.0 / 100), self.__some_function_timer)
+        rospy.Timer(
+            rospy.Duration(1.0 / 100),
+            self.__some_function_timer,
+        )
 
     # # Dependency status callbacks:
     # NOTE: each dependency topic should have a callback function, which will
     # set __dependency_status variable.
     def __dependency_name_callback(self, message):
-        """Monitors <node_name> is_initialized topic.
+        """Monitors <node_name>/is_initialized topic.
         
         """
 
@@ -130,8 +140,8 @@ class ClassName:
 
         """
 
-    # Timer callbacks:
-    def __seme_function_timer(self, event):
+    # # Timer callbacks:
+    def __some_function_timer(self, event):
         """Calls <some_function> on each timer callback with 100 Hz frequency.
         
         """
@@ -139,6 +149,7 @@ class ClassName:
         self.__some_function()
 
     # # Private methods:
+    # NOTE: By default all new class methods should be private.
     def __check_initialization(self):
         """Monitors required criteria and sets is_initialized variable.
 
@@ -161,7 +172,7 @@ class ClassName:
             if self.__dependency_status_topics[key].get_num_connections() != 1:
                 if self.__dependency_status[key]:
                     rospy.logerr(
-                        (f'{self.NODE_NAME}: '
+                        (f'{self.__NODE_NAME}: '
                          f'lost connection to {key}!')
                     )
 
@@ -183,7 +194,7 @@ class ClassName:
             rospy.logwarn_throttle(
                 15,
                 (
-                    f'{self.NODE_NAME}:'
+                    f'{self.__NODE_NAME}:'
                     f'{waiting_for}'
                     # f'\nMake sure those dependencies are running properly!'
                 ),
@@ -192,7 +203,7 @@ class ClassName:
         # NOTE (optionally): Add more initialization criterea if needed.
         if (self.__dependency_initialized):
             if not self.__is_initialized:
-                rospy.loginfo(f'\033[92m{self.NODE_NAME}: ready.\033[0m',)
+                rospy.loginfo(f'\033[92m{self.__NODE_NAME}: ready.\033[0m',)
 
                 self.__is_initialized = True
 
@@ -208,6 +219,7 @@ class ClassName:
         self.__node_is_initialized.publish(self.__is_initialized)
 
     # # Public methods:
+    # NOTE: By default all new class methods should be private.
     def main_loop(self):
         """
         
@@ -226,13 +238,13 @@ class ClassName:
         
         """
 
-        rospy.loginfo_once(f'{self.NODE_NAME}: node is shutting down...',)
+        rospy.loginfo_once(f'{self.__NODE_NAME}: node is shutting down...',)
 
         # NOTE: Add code, which needs to be executed on nodes' shutdown here.
         # Publishing to topics is not guaranteed, use service calls or
         # set parameters instead.
 
-        rospy.loginfo_once(f'{self.NODE_NAME}: node has shut down.',)
+        rospy.loginfo_once(f'{self.__NODE_NAME}: node has shut down.',)
 
 
 def main():
