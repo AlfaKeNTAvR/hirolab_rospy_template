@@ -65,9 +65,9 @@ class ClassName:
         )
 
         # NOTE: Specify dependency initial False initial status.
-        self.__dependency_status = {
-            # 'dependency_node_name': False,
-        }
+        self.__dependency_status = {}
+
+        # self.__dependency_status['<dependency_node_name>'] = False
 
         # NOTE: Specify dependency is_initialized topic (or any other topic,
         # which will be available when the dependency node is running properly).
@@ -77,7 +77,7 @@ class ClassName:
         #     rospy.Subscriber(
         #         f'/<dependency_node_name>/is_initialized',
         #         Bool,
-        #         self.__dependency_name_callback,
+        #         self.__<dependency_name>_callback,
         #     )
         # )
 
@@ -118,7 +118,7 @@ class ClassName:
     # NOTE: each dependency topic should have a callback function, which will
     # set __dependency_status variable.
     def __dependency_name_callback(self, message):
-        """Monitors <node_name>/is_initialized topic.
+        """Monitors /<node_name>/is_initialized topic.
         
         """
 
@@ -130,9 +130,10 @@ class ClassName:
 
         """
 
-        response = True
+        success = True
+        message = ''
 
-        return response
+        return success, message
 
     # # Topic callbacks:
     def __topic_name2_callback(self, message):
@@ -244,6 +245,9 @@ class ClassName:
         # Publishing to topics is not guaranteed, use service calls or
         # set parameters instead.
 
+        # NOTE: Placing a service call inside of a try-except block here causes
+        # the node to stuck.
+
         rospy.loginfo_once(f'{self.__NODE_NAME}: node has shut down.',)
 
 
@@ -266,7 +270,7 @@ def main():
 
     node_frequency = rospy.get_param(
         param_name=f'{rospy.get_name()}/node_frequency',
-        default=1000,
+        default=100,
     )
 
     parameter1 = rospy.get_param(
